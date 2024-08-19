@@ -1,0 +1,23 @@
+# Import the tfconfig/v2 import to access Terraform configuration data
+import "tfconfig/v2" as tfconfig
+
+### Logic ###
+
+# Find modules called from the root module that do not have a version constraint
+modules_without_version = filter tfconfig.module_calls as index, mc {
+  # A module is considered without a version if its version is not defined or is empty
+  not mc.version or mc.version is ""
+}
+
+# Print violation messages for modules without version constraints
+if length(modules_without_version) > 0 {
+  print("All modules called from the root module must have a version constraint.")
+  for modules_without_version as index, mc {
+    print("The module", mc.name, "called from the root module does not have a version constraint.")
+  }
+}
+
+# Main rule: only allow deployment if all modules have a version constraint
+main = rule {
+  length(modules_without_version) is 0
+}
