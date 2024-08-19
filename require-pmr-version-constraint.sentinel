@@ -5,8 +5,8 @@ import "tfconfig/v2" as tfconfig
 
 # Find modules called from the root module that do not have a version constraint
 modules_without_version = filter tfconfig.module_calls as index, mc {
-  # Check if the version attribute exists and is a non-empty string
-  not (mc contains "version" and mc.version != "")
+  # Check if the version attribute exists and is not empty
+  not mc.version or mc.version == ""
 }
 
 # Print violation messages for modules without version constraints
